@@ -2,14 +2,19 @@
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.opentelemetry.exporter.logging.SystemOutLogRecordExporter;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
-    public class UploadTestFile {
+public class UploadTestFile {
         WebDriver driver = new ChromeDriver();
 
         @BeforeTest
@@ -24,11 +29,25 @@ import java.io.File;
         }
 
         @Test
-        public void extractData(){
+        public void extractData() throws IOException {
             File excelFile = new File("src/main/resources/TestFile.xlsx");
-            System.out.println(excelFile.exists());
+            FileInputStream testFile = new FileInputStream(excelFile);
+            Workbook testWorkBook = new XSSFWorkbook(testFile);
+            Sheet sheet = testWorkBook.getSheet("Sheet1");
+
+            int rowCount = sheet.getPhysicalNumberOfRows();
+            int columnCount = sheet.getRow(0).getLastCellNum();
+
+            for (int i=1; i< rowCount; i++){
+                for (int j=0; j<columnCount; j++){
+                    System.out.println(sheet.getRow(i).getCell(j).getStringCellValue());
+                }
+            }
+
+            testWorkBook.close();
+            testFile.close();
         }
 
 
-    }
+}
 
